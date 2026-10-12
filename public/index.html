@@ -1,0 +1,994 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="RuangAI — asisten AI berbahasa Indonesia untuk mencari ide, belajar, menulis, dan menyusun rencana.">
+<title>RuangAI — Teman berpikir untuk setiap rencana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS & RESET ============ */
+:root{
+  --red:#c92032; --red-dark:#a71929; --red-pale:#fff1f2;
+  --ink:#242326; --muted:#79777b; --line:#ece9e9;
+  --paper:#ffffff; --cream:#fbf9f7; --navy:#282629;
+  --gold:#d4a642;
+  --shadow-sm:0 2px 8px rgba(42,18,18,.05);
+  --shadow-md:0 10px 30px rgba(42,18,18,.08);
+  --shadow-lg:0 24px 70px rgba(42,18,18,.12);
+  --r-sm:8px; --r-md:12px; --r-lg:16px;
+  --font:'Poppins',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button,a{font:inherit;color:inherit}
+button{cursor:pointer}
+img{max-width:100%;display:block}
+.hidden{display:none!important}
+.wrap{width:min(1160px,calc(100% - 48px));margin-inline:auto}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:4px}
+
+/* ============ IKON (Iconify) ============ */
+iconify-icon{display:inline-block;vertical-align:middle;flex:none;font-size:1em;line-height:1}
+.icon{display:inline-grid;place-items:center;border-radius:10px;background:var(--red-pale);color:var(--red)}
+.icon>iconify-icon{display:block}
+
+/* ============ TOMBOL ============ */
+.btn{height:42px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:1px solid transparent;border-radius:var(--r-sm);text-decoration:none;font-size:12px;font-weight:600;letter-spacing:.1px;transition:transform .16s,background .16s,border-color .16s,box-shadow .16s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 6px 16px rgba(201,32,50,.22)}
+.btn-red:hover{background:var(--red-dark)}
+.btn-white{background:#fff;color:var(--ink);border-color:#e9e4e4}
+.btn-white:hover{border-color:#d8c7c9;color:var(--red)}
+.btn-line-white{color:#fff;border-color:rgba(255,255,255,.4);background:transparent}
+.btn-line-white:hover{background:rgba(255,255,255,.08)}
+.btn>iconify-icon{font-size:15px}
+
+/* ============ HEADER ============ */
+.site-header{height:76px;position:sticky;top:0;z-index:40;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid #f1eeee;box-shadow:0 4px 20px rgba(42,18,18,.04)}
+.header-inner{height:100%;display:flex;align-items:center;gap:32px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:17px;font-weight:700;letter-spacing:-.6px;flex:none}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:var(--red);display:grid;place-items:center;color:#fff;box-shadow:0 4px 12px rgba(201,32,50,.3)}
+.brand-mark>iconify-icon{font-size:20px}
+.brand em{font-style:normal;color:var(--red)}
+.header-greeting{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;background:#fff7f7;border:1px solid #f4e5e6;border-radius:999px;color:#74686a;font-size:11px;white-space:nowrap}
+.flag-dot{display:inline-flex;width:16px;height:11px;border:1px solid #eee;border-radius:2px;overflow:hidden;flex-direction:column}
+.flag-dot i{display:block;flex:1;background:var(--red)}
+.flag-dot i+i{background:#fff}
+.main-nav{display:flex;align-items:center;gap:26px;margin-inline:auto}
+.main-nav a{position:relative;color:#69666a;text-decoration:none;font-size:12px;font-weight:500;padding:10px 0;transition:color .18s}
+.main-nav a::after{content:"";position:absolute;left:0;right:100%;bottom:4px;height:2px;border-radius:2px;background:var(--red);transition:right .24s}
+.main-nav a:hover,.main-nav a:focus-visible{color:var(--red)}
+.main-nav a:hover::after,.main-nav a:focus-visible::after{right:0}
+.header-actions{display:flex;align-items:center;gap:9px}
+.mobile-menu{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;color:#555;place-items:center}
+.mobile-menu>iconify-icon{font-size:18px}
+.nav-scrim{display:none}
+
+/* ============ HERO ============ */
+.hero{position:relative;padding:60px 0 50px;overflow:hidden}
+.hero-map-bg{position:absolute;z-index:0;width:min(1000px,90vw);height:auto;right:-12%;top:-10%;opacity:.1;pointer-events:none;user-select:none;transform:translate3d(0,var(--parallax-y,0),0);animation:drift 12s ease-in-out infinite alternate}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.02fr .98fr;align-items:center;gap:56px}
+.eyebrow{display:flex;align-items:center;gap:9px;color:var(--red);font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
+.hero h1{font-size:clamp(38px,4.4vw,58px);line-height:1.14;letter-spacing:-2.2px;font-weight:600;margin:18px 0 16px;max-width:600px}
+.hero h1 span{color:var(--red)}
+.hero-copy{max-width:460px;color:#777379;font-size:14px;line-height:1.85;margin:0 0 24px}
+.hero-buttons{display:flex;gap:10px;flex-wrap:wrap}
+.hero-note{display:flex;align-items:center;gap:8px;margin-top:24px;color:#8e898c;font-size:11px}
+.hero-note>iconify-icon{font-size:15px;color:#4f9a68}
+.hero-visual{min-height:380px;position:relative;display:grid;place-items:center}
+.batik-frame{position:absolute;width:88%;height:82%;right:1%;top:9%;border:1px solid #f1dfe0;border-radius:22px;background-color:#fffafa;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 16 16 0 32 16 16 32Z' fill='none' stroke='%23edcfd1' stroke-width='.7'/%3E%3Cpath d='M0 16 16 32 32 16 16 0Z' fill='none' stroke='%23f4e2e3' stroke-width='.7'/%3E%3C/svg%3E");opacity:.8}
+.hero-label{position:absolute;right:0;top:0;font-size:9px;letter-spacing:2px;color:#c2a9ac;font-weight:600}
+.visual-card{position:relative;z-index:1;width:min(400px,92%);border:1px solid #eee8e8;background:#fff;border-radius:var(--r-md);box-shadow:var(--shadow-lg);padding:18px}
+.visual-head{display:flex;align-items:center;gap:9px;border-bottom:1px solid #f0eded;padding-bottom:12px}
+.mini-logo{width:28px;height:28px;background:var(--red);color:#fff;display:grid;place-items:center;border-radius:8px;flex:none}
+.mini-logo>iconify-icon{font-size:14px}
+.visual-head b{font-size:11px}
+.live-dot{margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#65a37a;font-size:9px;font-weight:600}
+.live-dot::before{content:"";width:6px;height:6px;border-radius:50%;background:#5da377;animation:pulse 2s infinite}
+.chat-demo{display:grid;gap:10px;padding-top:14px}
+.demo-user{max-width:85%;justify-self:end;background:var(--red);color:#fff;font-size:11px;line-height:1.6;padding:9px 13px;border-radius:12px 12px 3px 12px}
+.demo-ai{display:flex;gap:8px;align-items:flex-start}
+.demo-ai p{margin:0;font-size:11px;line-height:1.7;color:#565155;background:#faf8f8;border:1px solid #f0eded;padding:9px 12px;border-radius:3px 12px 12px 12px}
+.demo-chips{display:flex;gap:6px;justify-content:flex-end}
+.demo-chips span{font-size:9px;color:#8a8588;border:1px solid #eee9e9;border-radius:999px;padding:4px 10px}
+.floating-note{position:absolute;left:2%;bottom:2%;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #f0eded;border-radius:var(--r-md);box-shadow:var(--shadow-md);padding:11px 14px;animation:float-soft 5s ease-in-out infinite}
+.floating-icon{width:30px;height:30px;border-radius:9px;background:var(--red-pale);color:var(--red);display:grid;place-items:center;flex:none}
+.floating-icon>iconify-icon{font-size:15px}
+.floating-note b{display:block;font-size:10px}
+.floating-note span{font-size:9px;color:#928c90}
+
+/* ============ VALUE STRIP ============ */
+.value-strip{border-block:1px solid #f1eeee;background:#fff;padding:18px 0}
+.value-items{display:flex;align-items:center;justify-content:center;gap:56px;flex-wrap:wrap}
+.value-item{display:flex;align-items:center;gap:9px;color:#716d70;font-size:11px;font-weight:500}
+.value-item>iconify-icon{font-size:16px;color:var(--red)}
+
+/* ============ NUSANTARA ============ */
+.archipelago{padding:52px 0;background:#fff8f8;border-block:1px solid #f5e8e9;overflow:hidden}
+.arch-grid{display:grid;grid-template-columns:.8fr 1.2fr;align-items:center;gap:40px}
+.arch-copy h2{font-size:27px;line-height:1.35;letter-spacing:-.7px;font-weight:600;margin:10px 0}
+.arch-copy p{font-size:12px;line-height:1.85;color:#817a7d;max-width:400px;margin:0 0 18px}
+.arch-caption{display:flex;align-items:center;gap:8px;font-size:9px;color:#92888b;margin-top:16px}
+.arch-image-wrap{position:relative;min-width:0}
+.arch-image{display:block;width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(167,25,41,.1));transform:translate3d(0,var(--parallax-y,0),0);transition:transform .2s linear;will-change:transform}
+.arch-label{display:block;text-align:right;font-size:8px;letter-spacing:1.4px;color:#a99598;margin-top:4px;font-weight:600}
+
+/* ============ PENATAAN ASET PNG ============ */
+.hero-map-bg{opacity:.055;filter:saturate(.82)}
+.arch-image-wrap{padding:18px 20px 12px;border:1px solid rgba(201,32,50,.09);border-radius:24px;background:#fffafa;box-shadow:0 18px 48px rgba(122,35,44,.07)}
+.arch-image{filter:drop-shadow(0 12px 18px rgba(167,25,41,.17));transform:translate3d(0,var(--parallax-y,0),0) scale(1.015)}
+.arch-label{text-align:center;margin-top:10px;color:#a98d91}
+.journey-intro{display:block;text-align:center}
+.journey-intro .section-head{width:min(100%,720px);margin:0 auto}
+
+/* ============ SECTION GENERIK ============ */
+.section{padding:80px 0}
+.section.soft{background:var(--cream)}
+.section-head{text-align:center;max-width:600px;margin:0 auto 34px}
+.section-kicker{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--red)}
+.section-head h2{font-size:30px;line-height:1.3;letter-spacing:-.8px;margin:10px 0 8px;font-weight:600}
+.section-head p{font-size:12px;color:#858084;line-height:1.8;margin:0}
+
+/* ============ FITUR ============ */
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feature-card{position:relative;border:1px solid #eee9e9;border-radius:var(--r-md);background:#fff;padding:24px;min-height:180px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.feature-card:hover{transform:translateY(-3px);border-color:#e6c3c6;box-shadow:var(--shadow-md)}
+.feature-num{float:right;color:#d7d1d1;font-size:11px;font-weight:700}
+.feature-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:11px;background:var(--red-pale);color:var(--red);margin-bottom:16px}
+.feature-icon>iconify-icon{font-size:19px}
+.feature-card h3{font-size:13px;margin:0 0 8px;font-weight:600}
+.feature-card p{font-size:11px;color:#858084;line-height:1.8;margin:0}
+
+/* ============ CARA KERJA ============ */
+.journey-intro{display:flex;align-items:center;justify-content:center;gap:30px;margin-bottom:28px}
+.journey-intro .section-head{flex:1;margin:0}
+.journey-intro .section-head h2{font-size:clamp(26px,3vw,34px)}
+.journey-shell{position:relative}
+.journey-rail{position:absolute;top:30px;bottom:30px;left:50%;width:1px;background:#eadfe0}
+.journey-rail span{position:absolute;left:-3.5px;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid #e7bfc4}
+.journey-rail span:nth-child(1){top:0}
+.journey-rail span:nth-child(2){top:50%}
+.journey-rail span:nth-child(3){bottom:0}
+.journey-grid{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.journey-card{display:flex;flex-direction:column;gap:14px;border:1px solid #eee9e9;border-radius:var(--r-md);background:#fff;padding:22px;min-height:190px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.journey-card:hover{transform:translateY(-3px);border-color:#e6c3c6;box-shadow:var(--shadow-md)}
+.journey-card-top{display:flex;align-items:center;justify-content:space-between}
+.journey-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:var(--red-pale);color:var(--red);font-size:18px}
+.journey-icon>iconify-icon{font-size:18px}
+.step-num{font-size:10px;font-weight:700;color:#c9aeb2;letter-spacing:1px}
+.journey-card h3{font-size:13px;margin:2px 0 6px;font-weight:600}
+.journey-card p{font-size:11px;line-height:1.8;color:#817c80;margin:0}
+.journey-chip{display:inline-flex;align-items:center;gap:6px;margin-top:auto;font-size:9px;font-weight:600;color:var(--red);background:var(--red-pale);border-radius:999px;padding:5px 11px;width:fit-content}
+.journey-chip>iconify-icon{font-size:12px}
+.journey-next{display:none}
+.journey-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:18px;border:1px dashed #eadfe0;border-radius:var(--r-md);background:#fff;padding:14px 18px}
+.journey-footer>span{display:flex;align-items:center;gap:8px;font-size:10px;color:#817c80}
+.journey-footer>span>iconify-icon{font-size:14px;color:var(--red)}
+.journey-link{display:inline-flex;align-items:center;gap:7px;border:0;background:none;color:var(--red);font-size:10px;font-weight:600;padding:4px 0}
+.journey-link>iconify-icon{font-size:13px}
+
+/* ============ PENGGUNAAN ============ */
+.usecases{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.usecase{background:#fff;border:1px solid #eee9e9;border-radius:var(--r-md);padding:18px 16px;min-height:110px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.usecase:hover{transform:translateY(-3px);border-color:#e6c3c6;box-shadow:var(--shadow-sm)}
+.usecase>span{display:block;color:var(--red);font-size:17px;margin-bottom:10px}
+.usecase>span>iconify-icon{font-size:17px}
+.usecase b{display:block;font-size:11px;font-weight:600;margin-bottom:4px}
+.usecase small{font-size:9px;color:#8a8588;line-height:1.6}
+
+/* ============ FAQ ============ */
+.faq-list{max-width:780px;margin-inline:auto;border-top:1px solid var(--line)}
+details{border-bottom:1px solid var(--line);padding:16px 4px}
+summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:12px;font-weight:500}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--red);font-size:20px;font-weight:400;flex:none}
+details[open] summary::after{content:"−"}
+details p{font-size:11px;color:#817c80;line-height:1.85;margin:12px 32px 0 0}
+
+/* ============ CTA ============ */
+.cta-panel{position:relative;overflow:hidden;background:var(--red);color:#fff;border-radius:var(--r-lg);padding:38px 44px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.cta-panel::after{content:"INDONESIA";position:absolute;right:16%;bottom:-24px;font-size:66px;letter-spacing:6px;font-weight:800;color:rgba(255,255,255,.06);pointer-events:none}
+.cta-panel h2{font-size:25px;letter-spacing:-.5px;margin:0 0 8px;position:relative;z-index:1}
+.cta-panel p{font-size:11px;color:#ffe4e6;margin:0;position:relative;z-index:1}
+.cta-panel .btn{position:relative;z-index:1;flex:none}
+
+/* ============ FOOTER ============ */
+.site-footer{background:var(--navy);color:#fff;padding:36px 0 20px}
+.footer-main{display:flex;justify-content:space-between;gap:30px;padding-bottom:28px;flex-wrap:wrap}
+.footer-brand{color:#fff}
+.footer-copy{font-size:10px;color:#c2bec0;max-width:290px;line-height:1.8;margin:12px 0 0}
+.footer-links{display:flex;gap:44px}
+.footer-col b{display:block;color:#fff;font-size:10px;margin-bottom:12px;letter-spacing:.4px}
+.footer-col a{display:block;color:#c2bec0;font-size:10px;text-decoration:none;margin:8px 0;transition:color .18s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.14);padding-top:16px;color:#aaa5a8;font-size:9px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* ============ WORKSPACE ============ */
+.workspace{height:100dvh;display:grid;grid-template-columns:250px minmax(0,1fr);background:#fff}
+.workspace-aside{background:var(--cream);border-right:1px solid var(--line);padding:22px 14px 14px;display:flex;flex-direction:column;min-height:0}
+.workspace-aside .brand{padding:0 8px 24px}
+.workspace-aside .brand-mark{width:32px;height:32px}
+.workspace-nav{display:grid;gap:4px}
+.workspace-nav button,.workspace-history button{width:100%;min-height:40px;padding:0 11px;display:flex;align-items:center;gap:10px;text-align:left;background:transparent;border:0;border-radius:var(--r-sm);color:#716d70;font-family:var(--font);font-size:11px;font-weight:500;transition:background .15s,color .15s}
+.workspace-nav button:hover,.workspace-nav button.active,.workspace-history button:hover{background:#fcebed;color:var(--red)}
+.workspace-nav button>iconify-icon,.workspace-history button>iconify-icon{font-size:15px}
+.workspace-label{font-size:9px;color:#a39b9e;letter-spacing:1px;text-transform:uppercase;font-weight:700;padding:20px 10px 8px}
+.workspace-history{display:grid;align-content:start;grid-auto-rows:max-content;gap:4px;overflow-y:auto;flex:1;min-height:0;padding:4px 0 12px}
+.workspace-history button{height:42px;min-width:0;white-space:nowrap;overflow:hidden;font-size:12px;cursor:pointer}
+.workspace-history button .history-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workspace-history button>iconify-icon{font-size:17px;flex-shrink:0}
+.workspace-history button.active{background:#fcebed;color:var(--red)}
+.workspace-history button:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.history-empty{margin:0;padding:6px 12px;font-size:10px;color:#b0aab0}
+.workspace-user{border-top:1px solid var(--line);padding-top:12px;display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.workspace-user b{font-size:10px;display:block}
+.workspace-user small{font-size:9px;color:#938e91}
+.overlay{display:none}
+.workspace-main{min-width:0;min-height:0;display:flex;flex-direction:column}
+.workspace-top{height:58px;flex:none;display:flex;align-items:center;padding:0 26px;border-bottom:1px solid #f0eded;gap:10px;background:#fff}
+.workspace-top .crumb{font-size:10px;color:#858084}
+.back-site{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:var(--r-sm);min-height:34px;padding:0 12px;color:#686367;font-family:var(--font);font-size:10px;font-weight:500;transition:border-color .15s,color .15s}
+.back-site:hover{border-color:#e6c5c8;color:var(--red)}
+.workspace-content{padding:30px;overflow-y:auto;flex:1;background:#fff;min-height:0}
+.dash-content{max-width:1060px;margin-inline:auto}
+.dash-intro{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px;flex-wrap:wrap}
+.dash-intro h1{font-size:24px;letter-spacing:-.6px;margin:0 0 6px;font-weight:600}
+.dash-intro p{font-size:11px;color:#858084;margin:0}
+.dash-actions{display:flex;gap:8px}
+.dash-welcome{display:grid;grid-template-columns:1.4fr .6fr;gap:20px;align-items:center;background:#fff8f8;border:1px solid #f4e5e6;border-radius:var(--r-lg);padding:28px;margin-bottom:28px}
+.dash-welcome .eyebrow{margin-bottom:8px}
+.dash-welcome h2{font-size:22px;letter-spacing:-.5px;margin:0 0 6px;font-weight:600}
+.dash-welcome p{font-size:11px;color:#858084;margin:0 0 16px}
+.dash-symbol{width:88px;height:88px;border-radius:24px;background:var(--red-pale);color:var(--red);display:grid;place-items:center;justify-self:end}
+.dash-symbol>iconify-icon{font-size:36px}
+.dash-section-title{font-size:12px;font-weight:600;margin:0 0 14px}
+.workspace-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.workspace-quick button{display:flex;flex-direction:column;gap:10px;text-align:left;border:1px solid #eee9e9;border-radius:var(--r-md);background:#fff;padding:16px;min-height:120px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.workspace-quick button:hover{transform:translateY(-3px);border-color:#e6c3c6;box-shadow:var(--shadow-md)}
+.workspace-quick button b{font-size:11px;font-weight:600}
+.workspace-quick button span{font-size:9px;color:#928c90}
+.workspace-lower{display:grid;grid-template-columns:1.4fr .85fr;gap:12px;margin-top:18px}
+.workspace-panel{border:1px solid #eee9e9;border-radius:var(--r-md);background:#fff;padding:18px}
+.workspace-panel h3{font-size:11px;font-weight:600;margin:0 0 12px}
+.recent-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:none;padding:10px 8px;border-radius:var(--r-sm);transition:background .15s}
+.recent-btn:hover{background:#fcebed}
+.recent-btn .feature-icon{width:34px;height:34px;margin:0}
+.recent-btn .feature-icon>iconify-icon{font-size:15px}
+.recent-btn b{display:block;font-size:10px;font-weight:600}
+.recent-btn small{font-size:9px;color:#928c90}
+.dashboard-tip p{font-size:10px;color:#817c80;line-height:1.8;margin:0}
+.dashboard-tip strong{color:#565155}
+
+/* ============ CHAT ============ */
+.chat-area{display:none;min-height:0;flex:1;flex-direction:column}
+.chat-area.active{display:flex}
+.chat-header{height:50px;flex:none;border-bottom:1px solid #f1eeee;display:flex;align-items:center;padding:0 26px;gap:10px;background:#fff}
+.chat-heading{font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-status{margin-left:auto;display:inline-flex;align-items:center;gap:7px;color:#858084;font-size:11px;flex:none}
+.chat-status::before{content:"";width:6px;height:6px;border-radius:50%;background:#5da377}
+.chat-scroll{flex:1;overflow-y:auto;padding:24px 18px;min-height:0}
+.conversation{max-width:700px;margin-inline:auto}
+.chat-welcome{text-align:center;padding:clamp(28px,6vh,64px) 0 28px}
+.chat-emblem{width:46px;height:46px;margin:0 auto 13px;border-radius:14px;background:var(--red-pale);color:var(--red);display:grid;place-items:center}
+.chat-emblem>iconify-icon{font-size:22px}
+.chat-welcome h2{font-size:clamp(24px,3vw,30px);line-height:1.35;letter-spacing:-.7px;margin:0 0 12px;font-weight:600}
+.chat-welcome p{font-size:13px;line-height:1.8;color:#817a7e;max-width:510px;margin:0 auto}
+.guided-link{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;max-width:100%;min-height:44px;margin-top:20px;padding:11px 16px;border:1px solid #f0cbd0;border-radius:12px;background:#fff5f6;color:var(--red);font-size:12px;font-weight:600;line-height:1.5;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s}
+.guided-link:hover{background:#ffecef;border-color:#df9ca7;box-shadow:0 4px 14px rgba(201,32,50,.08)}
+.guided-link>iconify-icon{font-size:17px}
+.guided-link>iconify-icon:last-child{font-size:15px}
+.guided-link:focus-visible,.prompt-card:focus-visible,.composer-tools button:focus-visible{outline:3px solid #e8a3ae;outline-offset:3px}
+.prompt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:580px;margin:28px auto 0}
+.prompt-card{display:block;min-width:0;min-height:108px;border:1px solid #eee9e9;border-radius:12px;background:#fff;padding:18px;text-align:left;font-family:var(--font);cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
+.prompt-card:hover{border-color:#e6c3c6;background:#fffafa;transform:translateY(-2px)}
+.prompt-card b{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.prompt-card b>iconify-icon{font-size:17px;color:var(--red)}
+.prompt-card span{font-size:12px;line-height:1.7;color:#817a7e}
+.messages{display:grid;gap:16px;padding:4px 0 24px}
+.message{display:flex;align-items:flex-start;gap:9px;max-width:88%;animation:rise .22s ease-out}
+.message.user{justify-self:end;margin-left:auto;flex-direction:row;justify-content:flex-end}
+.ai-mark{width:27px;height:27px;background:var(--red);color:#fff;border-radius:8px;display:grid;place-items:center;flex:none}
+.ai-mark>iconify-icon{font-size:14px}
+.bubble{font-size:14px;line-height:1.8;color:#565155;background:#faf8f8;border:1px solid #f0eded;border-radius:3px 12px 12px 12px;padding:10px 14px;overflow-wrap:anywhere;white-space:pre-wrap}
+.message.error .bubble{background:#fff4f4;border-color:#e8b4bb;color:#9a2838}
+.retry-message{display:block;margin-top:10px;padding:7px 12px;border:1px solid #e8b4bb;border-radius:8px;background:#fff;color:#9a2838;font:inherit;cursor:pointer}
+.chat-status[data-state="error"]::before{background:#ce4358}
+.chat-status[data-state="loading"]::before,.chat-status[data-state="configured"]::before{background:#c39439}
+.send:disabled{opacity:.45;cursor:wait}
+.message.user .bubble{background:var(--red);border-color:var(--red);color:#fff;border-radius:12px 3px 12px 12px}
+.message .bubble{min-width:0}
+.markdown-body{white-space:normal;padding:16px 18px}
+.markdown-body>:first-child{margin-top:0}
+.markdown-body>:last-child{margin-bottom:0}
+.markdown-body p{margin:0 0 14px}
+.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{font-size:16px;line-height:1.5;color:var(--ink);margin:20px 0 10px;font-weight:600}
+.markdown-body h1{font-size:20px}
+.markdown-body h2{font-size:18px}
+.markdown-body strong{font-weight:600;color:var(--ink)}
+.markdown-body ul,.markdown-body ol{padding-left:24px;margin:10px 0 16px}
+.markdown-body li{padding-left:3px;margin:6px 0}
+.markdown-body li>p{margin:6px 0}
+.markdown-body a{color:var(--red);text-decoration:underline;text-underline-offset:3px}
+.markdown-body code{font-family:Consolas,monospace;font-size:.9em;background:#eee9ec;border-radius:4px;padding:2px 5px}
+.markdown-body pre{max-width:100%;overflow-x:auto;white-space:pre;background:#27242b;color:#f7f4f7;border-radius:10px;padding:14px;margin:14px 0;line-height:1.65}
+.markdown-body pre code{background:none;color:inherit;padding:0}
+.markdown-body blockquote{border-left:3px solid #e4a8b3;margin:14px 0;padding:2px 14px;color:#817a7e}
+.markdown-body blockquote p:last-child{margin-bottom:0}
+.markdown-body table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse;margin:14px 0;font-size:13px}
+.markdown-body th,.markdown-body td{border:1px solid #e9e2e5;padding:8px 12px;text-align:left}
+.markdown-body th{background:#f3edef;font-weight:600}
+.markdown-body hr{border:0;border-top:1px solid #e9e2e5;margin:18px 0}
+.loading-copy{font-size:9px;color:#9a777a;margin-bottom:5px}
+.typing{display:flex;align-items:center;gap:4px}
+.typing i{width:5px;height:5px;border-radius:50%;background:#c9aeb2;animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}
+.typing i:nth-child(3){animation-delay:.4s}
+.composer-wrap{padding:10px 18px calc(14px + env(safe-area-inset-bottom));flex:none;background:#fff}
+.composer{max-width:700px;margin-inline:auto;border:1px solid #e9e4e4;border-radius:var(--r-md);background:#fff;box-shadow:var(--shadow-sm);transition:border-color .15s,box-shadow .15s}
+.composer:focus-within{border-color:#e6c3c6;box-shadow:var(--shadow-md)}
+.composer textarea{display:block;width:100%;border:0;resize:none;outline:none;padding:15px 16px 8px;font-family:var(--font);font-size:14px;line-height:1.7;color:var(--ink);background:transparent;max-height:120px}
+.composer-tools{display:flex;align-items:center;gap:4px;padding:4px 8px 8px}
+.composer-tools button{width:36px;height:36px;border:0;border-radius:var(--r-sm);background:transparent;color:#8a8588;display:grid;place-items:center;transition:background .15s,color .15s}
+.composer-tools button:hover{background:var(--red-pale);color:var(--red)}
+.composer-tools button>iconify-icon{font-size:15px}
+.composer-hint{margin-left:6px;font-size:9px;color:#b0aab0}
+.composer-tools .send{margin-left:auto;width:38px;height:38px;background:var(--red);color:#fff;border-radius:var(--r-sm);box-shadow:0 4px 12px rgba(201,32,50,.25);transition:background .15s,transform .15s,opacity .15s}
+.send:hover{background:var(--red-dark)!important;transform:translateY(-1px)}
+.send:disabled{opacity:.5;cursor:wait;transform:none}
+.send>iconify-icon{font-size:16px}
+.composer-disclaimer{max-width:700px;margin:7px auto 0;font-size:8px;color:#b0aab0;text-align:center}
+
+/* ============ WIZARD (MODAL) ============ */
+body.wizard-open{overflow:hidden}
+.guided-modal{position:fixed;inset:0;z-index:60;background:rgba(33,23,25,.46);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:none;place-items:center;padding:20px}
+.guided-modal.open{display:grid;animation:overlay-enter .28s ease-out both}
+.guided-dialog{width:min(580px,100%);max-height:min(740px,92dvh);overflow-y:auto;background:#fff;border:1px solid #f1e5e6;border-radius:var(--r-lg);box-shadow:var(--shadow-lg)}
+.wizard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:22px 24px 14px}
+.wizard-eyebrow{font-size:9px;font-weight:700;letter-spacing:1.4px;color:var(--red)}
+.wizard-step-label{font-size:10px;color:#858084;margin-top:4px}
+.wizard-close{width:36px;height:36px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;color:#8a8588;display:grid;place-items:center;transition:background .15s,color .15s}
+.wizard-close:hover{background:var(--red-pale);color:var(--red)}
+.wizard-close>iconify-icon{font-size:16px}
+.wizard-progress{height:3px;background:#f4eef0;margin:0 24px;border-radius:99px;overflow:hidden}
+.wizard-progress span{display:block;height:100%;background:var(--red);border-radius:99px;transition:width .3s}
+.wizard-content{padding:20px 24px 24px;min-height:300px}
+.wizard-content h2{font-size:19px;letter-spacing:-.4px;margin:0 0 6px;font-weight:600}
+.wizard-content>p{font-size:11px;color:#858084;margin:0 0 18px}
+.wizard-panel{display:none}
+.wizard-panel.active{display:block;animation:panel-in .3s ease-out both}
+.flow-options{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.flow-option{display:flex;align-items:flex-start;gap:10px;min-height:76px;padding:13px;border:1px solid #eee9e9;border-radius:var(--r-sm);background:#fff;text-align:left;font-family:var(--font);transition:border-color .15s,background .15s,transform .15s}
+.flow-option:hover{border-color:#e6c3c6;background:#fffafa}
+.flow-option[aria-pressed="true"]{border-color:var(--red);background:var(--red-pale)}
+.flow-option>iconify-icon{font-size:17px;color:var(--red);margin-top:2px}
+.flow-option b{display:block;font-size:11px;font-weight:600;margin-bottom:3px}
+.flow-option small{font-size:9px;color:#928c90;line-height:1.5}
+.wizard-label{display:block;font-size:10px;font-weight:600;margin-bottom:10px}
+.wizard-label textarea,.wizard-label input{width:100%;border:1px solid #e9e4e4;border-radius:var(--r-sm);padding:12px 14px;font-family:var(--font);font-size:11px;line-height:1.7;resize:vertical;outline:none;transition:border-color .15s}
+.wizard-label textarea:focus,.wizard-label input:focus{border-color:#e6c3c6}
+.field-meta{display:flex;justify-content:space-between;font-size:9px;color:#b0aab0;margin-top:7px}
+.format-options{grid-template-columns:repeat(2,1fr)}
+.review-label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--red);margin-bottom:12px}
+.review-label>iconify-icon{font-size:15px}
+.prompt-preview{border:1px dashed #eadfe0;border-radius:var(--r-sm);background:var(--cream);padding:15px;font-size:11px;line-height:1.8;color:#565155;white-space:pre-wrap}
+.review-help{font-size:9px;color:#b0aab0;margin:10px 0 0}
+.wizard-footer{display:flex;justify-content:space-between;gap:10px;padding:14px 24px calc(16px + env(safe-area-inset-bottom));border-top:1px solid #f0eded}
+.wizard-back{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;color:#686367;font-size:10px;font-weight:600;transition:border-color .15s,color .15s}
+.wizard-back:disabled{opacity:.4;cursor:default}
+.wizard-back>iconify-icon{font-size:13px}
+.wizard-next{height:38px;padding:0 16px;border:0;border-radius:var(--r-sm);background:var(--red);color:#fff;font-size:10px;font-weight:600;display:inline-flex;align-items:center;gap:7px;transition:background .15s}
+.wizard-next:hover{background:var(--red-dark)}
+.wizard-next:disabled{opacity:.45;cursor:default}
+.wizard-next>iconify-icon{font-size:13px}
+
+/* ============ TOAST / PROGRESS / BACK-TO-TOP ============ */
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);z-index:70;background:var(--navy);color:#fff;font-size:10px;padding:11px 18px;border-radius:999px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.scroll-progress{position:fixed;inset:0 auto auto 0;height:3px;width:0;background:var(--red);z-index:50}
+.back-to-top{position:fixed;right:22px;bottom:22px;width:42px;height:42px;border:0;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;box-shadow:0 6px 18px rgba(104,19,29,.28);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .2s,transform .2s,visibility .2s;z-index:45}
+.back-to-top.visible{opacity:1;visibility:visible;transform:translateY(0)}
+.back-to-top:hover{background:var(--red-dark);transform:translateY(-2px)}
+.back-to-top>iconify-icon{font-size:18px}
+
+/* ============ REVEAL & PARALLAX ============ */
+.reveal{opacity:0;transform:translate3d(0,26px,0);transition:opacity 1s cubic-bezier(.2,.68,.15,1),transform 1s cubic-bezier(.2,.68,.15,1);will-change:opacity,transform}
+.reveal.in-view{opacity:1;transform:translate3d(0,0,0)}
+.reveal-child{opacity:0;transform:translate3d(0,15px,0);transition:opacity .8s cubic-bezier(.2,.68,.15,1),transform .8s cubic-bezier(.2,.68,.15,1)}
+.reveal.in-view .reveal-child{opacity:1;transform:translate3d(0,0,0);transition-delay:calc(var(--stagger-index,0)*90ms)}
+.arch-image{transform:translate3d(0,var(--parallax-y,0),0)}
+.parallax-layer{will-change:transform}
+
+/* ============ ANIMASI ============ */
+.intro-motion{animation:hero-enter 1.05s cubic-bezier(.2,.68,.15,1) both}
+.route-in{animation:route-in .38s cubic-bezier(.2,.68,.15,1) both}
+@keyframes hero-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes route-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes panel-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes overlay-enter{from{opacity:0}to{opacity:1}}
+@keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-14px,0)}}
+@keyframes float-soft{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:900px){
+  .header-inner{gap:20px}
+  .header-greeting{display:none}
+  .main-nav{gap:18px}
+  .hero-grid{gap:32px}
+  .hero-visual{min-height:340px}
+  .value-items{gap:26px}
+  .feature-grid{gap:12px}
+  .journey-intro{gap:20px}
+  .journey-grid{gap:12px}
+  .journey-card{padding:18px;gap:12px;min-height:170px}
+  .journey-card h3{font-size:12px}
+  .workspace-quick{grid-template-columns:repeat(2,1fr)}
+  .workspace-lower{grid-template-columns:1fr}
+  .usecases{grid-template-columns:repeat(2,1fr)}
+  .dash-welcome{grid-template-columns:1fr;padding:22px}
+  .dash-symbol{justify-self:start;width:72px;height:72px}
+  .dash-symbol>iconify-icon{font-size:28px}
+}
+@media(max-width:700px){
+  html{scroll-padding-top:70px}
+  .wrap{width:min(100% - 32px,540px)}
+  .site-header{height:66px}
+  .header-inner{gap:10px}
+  .brand{font-size:15px}
+  .brand-mark{width:33px;height:33px}
+  .main-nav{display:none;position:absolute;top:65px;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);padding:12px 20px 16px;align-items:stretch;gap:0;flex-direction:column;box-shadow:0 20px 40px rgba(42,18,18,.08)}
+  .main-nav.open{display:flex;animation:menu-enter .2s ease-out}
+  .main-nav a{padding:12px 2px;border-bottom:1px solid #f5f2f2}
+  .main-nav a:last-child{border-bottom:0}
+  .header-actions{margin-left:auto;gap:6px}
+  .header-actions .btn{height:36px;padding:0 12px;font-size:10px}
+  .header-actions #loginBtn{display:none}
+  .mobile-menu{display:grid}
+  .nav-scrim.active{display:block;position:fixed;inset:65px 0 0;border:0;background:rgba(33,23,25,.27);z-index:39;animation:overlay-enter .18s ease-out}
+  .hero{padding:38px 0 32px}
+  .hero-grid{grid-template-columns:1fr;gap:24px}
+  .hero h1{font-size:38px;letter-spacing:-1.7px;max-width:520px}
+  .hero-copy{font-size:12px;margin-bottom:18px}
+  .hero-note{margin-top:16px}
+  .hero-visual{min-height:300px}
+  .visual-card{width:min(380px,90%)}
+  .batik-frame{height:80%;width:91%;right:2%}
+  .hero-map-bg{width:150vw;right:-52%;top:2%;opacity:.08}
+  .value-strip{padding:14px 0}
+  .value-items{display:grid;grid-template-columns:1fr 1fr;gap:14px 10px}
+  .value-item{font-size:9px}
+  .section{padding:56px 0}
+  .section-head h2{font-size:24px}
+  .section-head p{font-size:10px}
+  .archipelago{padding:36px 0}
+  .arch-grid{grid-template-columns:1fr;gap:18px}
+  .arch-copy h2{font-size:22px}
+  .arch-copy p{font-size:10px}
+  .arch-image{max-height:180px}
+  .arch-label{text-align:center;font-size:7px}
+  .feature-grid{grid-template-columns:1fr}
+  .feature-card{min-height:unset;padding:18px}
+  .feature-icon{width:34px;height:34px;margin-bottom:12px}
+  .feature-icon>iconify-icon{font-size:16px}
+  .feature-card h3{font-size:12px}
+  .feature-card p{font-size:10px}
+  .journey-intro{position:relative;display:block;text-align:left;margin-bottom:20px;padding-right:96px;min-height:120px}
+  .journey-intro .section-head{text-align:left;margin:0}
+  .journey-intro .section-head h2{font-size:22px;line-height:1.4;margin-top:8px}
+  .journey-intro .section-head p{font-size:9px}
+  .journey-grid{grid-template-columns:1fr;gap:10px}
+  .journey-rail{top:34px;bottom:34px;left:15px;right:auto;width:1px;height:auto}
+  .journey-rail span{left:-3px!important;right:auto!important;top:auto;width:7px;height:7px}
+  .journey-rail span:nth-child(1){top:0}
+  .journey-rail span:nth-child(2){top:50%}
+  .journey-rail span:nth-child(3){bottom:0}
+  .journey-card{min-height:unset;padding:14px;border-radius:13px;gap:12px}
+  .journey-card-top{gap:6px}
+  .journey-icon{width:34px;height:34px;border-radius:10px}
+  .journey-card .step-num{font-size:9px}
+  .journey-card h3{font-size:11px;margin:2px 0 4px}
+  .journey-card p{font-size:9px;line-height:1.7}
+  .journey-chip{margin-top:8px;font-size:8px;padding:4px 8px}
+  .journey-next{display:none}
+  .journey-footer{align-items:flex-start;flex-direction:column;gap:8px;padding:12px}
+  .journey-footer>span,.journey-link{font-size:9px}
+  .journey-link{padding:2px 0}
+  .usecases{gap:8px}
+  .usecase{padding:14px 12px;min-height:unset}
+  .faq-list{max-width:100%}
+  details{padding:14px 2px}
+  summary{font-size:11px}
+  details p{font-size:10px;margin:10px 24px 0 0}
+  .cta-panel{flex-direction:column;align-items:flex-start;padding:26px 24px;gap:16px}
+  .cta-panel::after{right:4%;font-size:44px;bottom:-14px}
+  .cta-panel h2{font-size:20px}
+  .footer-main{flex-direction:column;gap:22px}
+  .footer-links{gap:28px}
+  /* Workspace mobile: sidebar jadi drawer */
+  .workspace{grid-template-columns:1fr}
+  .workspace-aside{position:absolute;top:0;bottom:0;left:0;width:272px;z-index:55;transform:translateX(-104%);transition:transform .3s cubic-bezier(.2,.75,.2,1);box-shadow:16px 0 40px rgba(39,17,20,.16);will-change:transform}
+  .workspace{position:relative}
+  .workspace.mobile-open .workspace-aside{transform:translateX(0)}
+  .workspace.mobile-open .overlay{display:block;position:absolute;inset:0;z-index:54;background:rgba(29,17,18,.34);animation:overlay-enter .2s ease-out}
+  .workspace-top{padding:0 16px}
+  .workspace-content{padding:20px 16px}
+  .dash-intro h1{font-size:20px}
+  .dash-actions{gap:6px;flex-wrap:wrap}
+  .dash-actions .btn{height:34px;padding:0 10px;font-size:9px}
+  .dash-welcome{padding:18px}
+  .dash-welcome h2{font-size:18px}
+  .dash-section-title{font-size:11px}
+  .workspace-quick{grid-template-columns:1fr 1fr;gap:8px}
+  .workspace-quick button{min-height:104px;padding:13px}
+  .workspace-lower{gap:9px;margin-top:14px}
+  .workspace-panel{padding:14px}
+  .guided-link{font-size:12px;padding:11px 12px;gap:7px}
+  .chat-status{font-size:10px}
+  .composer textarea{font-size:16px}
+  .chat-header{padding:0 16px}
+  .chat-scroll{padding:18px 12px}
+  .message{max-width:94%}
+  .composer-wrap{padding:8px 12px calc(12px + env(safe-area-inset-bottom))}
+  .composer-hint{display:none}
+  .prompt-grid{grid-template-columns:1fr;gap:8px}
+  .chat-welcome{padding-top:3vh}
+  .guided-modal{align-items:end;padding:0}
+  .guided-dialog{width:100%;max-height:94dvh;border-radius:20px 20px 0 0;animation:sheet-enter .5s cubic-bezier(.2,.7,.2,1) both}
+  .wizard-top{padding:18px 18px 10px}
+  .wizard-progress{margin:0 18px}
+  .wizard-content{padding:18px;min-height:280px}
+  .wizard-content h2{font-size:17px}
+  .flow-options{gap:7px}
+  .flow-option{min-height:68px;padding:11px;gap:8px}
+  .flow-option b{font-size:10px}
+  .flow-option small{font-size:8px}
+  .wizard-footer{padding:12px 18px calc(14px + env(safe-area-inset-bottom))}
+  .back-to-top{right:14px;bottom:14px;width:38px;height:38px}
+  .toast{bottom:18px;font-size:9px}
+}
+@media(max-width:370px){
+  .header-actions #headerStart{display:none}
+  .hero h1{font-size:34px}
+  .hero-buttons .btn{font-size:10px;padding:0 12px}
+  .hero-visual{min-height:270px}
+  .usecases{gap:7px}
+  .flow-options{grid-template-columns:1fr}
+  .flow-option{min-height:60px}
+  .wizard-content{min-height:260px}
+  .dash-actions .btn{font-size:8px;padding:0 8px}
+  .workspace-quick{grid-template-columns:1fr}
+}
+
+/* ============ REDUCED MOTION ============ */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .reveal,.reveal-child{opacity:1;transform:none;transition:none}
+  .scroll-progress{transition:none!important}
+}
+/* Final layout for the steps section: full-width heading, no mascot photo. */
+.journey-intro{display:block;text-align:center;margin-bottom:28px;padding:0;min-height:0}
+.journey-intro .section-head{width:min(100%,720px);margin:0 auto;text-align:center;flex:none}
+@media(max-width:700px){
+  .journey-intro{display:block;text-align:center;margin-bottom:20px;padding:0;min-height:0}
+  .journey-intro .section-head{width:100%;margin:0 auto;text-align:center}
+  .journey-intro .section-head h2{font-size:22px;line-height:1.4;margin-top:8px}
+  .journey-intro .section-head p{font-size:9px}
+}
+</style>
+<script src="https://code.iconify.design/iconify-icon/3.0.3/iconify-icon.min.js"></script>
+</head>
+<body>
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+<button class="back-to-top" id="backToTop" aria-label="Kembali ke atas"><iconify-icon icon="lucide:arrow-up" aria-hidden="true"></iconify-icon></button>
+
+<div id="landingPage">
+  <div id="headerMount"></div>
+  <button class="nav-scrim" id="navScrim" aria-label="Tutup navigasi"></button>
+  <main id="top">
+    <section class="hero">
+      <img class="hero-map-bg parallax-layer" data-parallax="0.2" src="assets/indonesia-archipelago.png" alt="" aria-hidden="true">
+      <div class="wrap hero-grid intro-motion">
+        <div>
+          <div class="eyebrow"><span class="flag-dot"><i></i><i></i></span> Asisten AI, dekat dengan Indonesia</div>
+          <h1>Teman berpikir untuk <span>setiap rencana.</span></h1>
+          <p class="hero-copy">Dari mencari ide sampai merapikan pekerjaan, RuangAI membantumu melangkah dengan lebih jelas — dalam bahasa yang terasa akrab.</p>
+          <div class="hero-buttons">
+            <button class="btn btn-red" data-dashboard>Mulai gratis <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon></button>
+            <a class="btn btn-white" href="#fitur">Kenali RuangAI</a>
+          </div>
+          <div class="hero-note"><iconify-icon icon="lucide:check" aria-hidden="true"></iconify-icon> Mulai dari pertanyaan sederhana, kembangkan seiring kebutuhanmu.</div>
+        </div>
+        <div class="hero-visual">
+          <div class="batik-frame"></div>
+          <span class="hero-label">BAHASA INDONESIA · IDE · KARYA</span>
+          <div class="visual-card">
+            <div class="visual-head">
+              <span class="mini-logo"><iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon></span>
+              <b>RuangAI</b>
+              <span class="live-dot">Siap menemani</span>
+            </div>
+            <div class="chat-demo">
+              <div class="demo-user">Bantu aku membuat rencana belajar coding yang konsisten.</div>
+              <div class="demo-ai">
+                <span class="mini-logo"><iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon></span>
+                <p>Yuk, mulai dengan rencana yang ringan dan bisa kamu jalankan. Berapa waktu luang yang kamu punya setiap hari?</p>
+              </div>
+              <div class="demo-chips"><span>Susun jadwal</span><span>Mulai dari dasar</span></div>
+            </div>
+          </div>
+          <div class="floating-note">
+            <span class="floating-icon"><iconify-icon icon="lucide:plus" aria-hidden="true"></iconify-icon></span>
+            <div><b>Mulai dari idemu</b><span>Ruang untuk berpikir dan mencoba</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="value-strip">
+      <div class="wrap value-items">
+        <div class="value-item"><iconify-icon icon="lucide:shield-check" aria-hidden="true"></iconify-icon>Bahasa Indonesia yang akrab</div>
+        <div class="value-item"><iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>Belajar dan bekerja dalam satu ruang</div>
+        <div class="value-item"><iconify-icon icon="lucide:clock-3" aria-hidden="true"></iconify-icon>Mulai kapan saja, sesuai ritmemu</div>
+      </div>
+    </div>
+
+    <section class="archipelago reveal" id="nusantara">
+      <div class="wrap arch-grid">
+        <div class="arch-copy">
+          <span class="section-kicker">Terinspirasi Nusantara</span>
+          <h2>Banyak pulau. Banyak cerita. Banyak kemungkinan.</h2>
+          <p>Dari berbagai sudut Indonesia, selalu ada hal baru untuk dipelajari, diceritakan, dan diwujudkan. RuangAI menjadi teman untuk memulai langkahmu.</p>
+          <button class="btn btn-red" data-dashboard>Jelajahi RuangAI <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon></button>
+          <div class="arch-caption"><span class="flag-dot"><i></i><i></i></span> Ilustrasi gugusan kepulauan Indonesia</div>
+        </div>
+        <div class="arch-image-wrap">
+          <img class="arch-image parallax-layer" data-parallax="0.12" src="assets/indonesia-archipelago.png" alt="Ilustrasi merah-putih gugusan kepulauan Indonesia" loading="lazy">
+          <span class="arch-label">NUSANTARA · SATU RUANG UNTUK BERTUMBUH</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="fitur">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="section-kicker">Satu ruang, banyak kemungkinan</span>
+          <h2>Bantuan yang mengikuti cara kerjamu.</h2>
+          <p>Gunakan RuangAI untuk memulai dari hal kecil, lalu kembangkan jawaban menjadi langkah berikutnya.</p>
+        </div>
+        <div class="feature-grid reveal">
+          <article class="feature-card">
+            <span class="feature-num">01</span>
+            <div class="feature-icon"><iconify-icon icon="lucide:lightbulb" aria-hidden="true"></iconify-icon></div>
+            <h3>Temukan arah dari ide</h3>
+            <p>Jabarkan gagasan, minta sudut pandang baru, lalu pilih langkah yang paling masuk akal.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-num">02</span>
+            <div class="feature-icon"><iconify-icon icon="lucide:pen-line" aria-hidden="true"></iconify-icon></div>
+            <h3>Rangkai tulisan lebih cepat</h3>
+            <p>Susun draf pesan, rangkuman, rencana, atau konten dengan nada dan tujuan yang kamu pilih.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-num">03</span>
+            <div class="feature-icon"><iconify-icon icon="lucide:code-xml" aria-hidden="true"></iconify-icon></div>
+            <h3>Pahami hal baru bersama</h3>
+            <p>Minta penjelasan bertahap, contoh yang dekat, atau versi singkat dari topik yang rumit.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft" id="cara-kerja">
+      <div class="wrap">
+        <div class="journey-intro">
+          <div class="section-head reveal">
+            <span class="section-kicker">Sederhana untuk dimulai</span>
+            <h2>Dari pertanyaan menuju langkah nyata.</h2>
+            <p>Kamu tetap memegang arah. RuangAI membantu menata pikiran dan pilihanmu.</p>
+          </div>
+        </div>
+        <div id="journeyMount"></div>
+      </div>
+    </section>
+
+    <section class="section" id="penggunaan">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="section-kicker">Bisa dipakai di keseharian</span>
+          <h2>Ruang untuk belajar, berkarya, dan bekerja.</h2>
+          <p>Mulai dari kegiatan yang paling dekat denganmu.</p>
+        </div>
+        <div class="usecases reveal">
+          <div class="usecase"><span><iconify-icon icon="lucide:graduation-cap" aria-hidden="true"></iconify-icon></span><b>Pelajar &amp; mahasiswa</b><small>Merangkum bahan, menyusun ide, memahami materi.</small></div>
+          <div class="usecase"><span><iconify-icon icon="lucide:briefcase-business" aria-hidden="true"></iconify-icon></span><b>Pekerja &amp; tim</b><small>Merapikan draf, membuat daftar, menyiapkan rencana.</small></div>
+          <div class="usecase"><span><iconify-icon icon="lucide:palette" aria-hidden="true"></iconify-icon></span><b>Pembuat karya</b><small>Mencari konsep, mengembangkan naskah, mencoba sudut baru.</small></div>
+          <div class="usecase"><span><iconify-icon icon="lucide:store" aria-hidden="true"></iconify-icon></span><b>Usaha kecil</b><small>Menyusun deskripsi produk, balasan pelanggan, dan promosi.</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft" id="faq">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="section-kicker">Pertanyaan umum</span>
+          <h2>Kenali RuangAI lebih dekat.</h2>
+          <p>Jawaban singkat sebelum kamu mulai mencoba.</p>
+        </div>
+        <div class="faq-list reveal">
+          <details><summary>Apa itu RuangAI?</summary><p>RuangAI adalah asisten AI untuk membantu bertanya, menyusun ide, belajar, dan mengerjakan berbagai kebutuhan dalam bahasa Indonesia.</p></details>
+          <details><summary>Apakah saya perlu tahu cara membuat prompt?</summary><p>Tidak. Mulailah dengan menjelaskan kebutuhanmu seperti sedang bercerita. Kamu dapat menambahkan detail sedikit demi sedikit.</p></details>
+          <details><summary>Apakah jawaban AI selalu benar?</summary><p>Belum tentu. Periksa kembali informasi penting dan gunakan pertimbanganmu sebelum mengambil keputusan.</p></details>
+          <details><summary>Bisakah saya mengubah jawaban yang diberikan?</summary><p>Bisa. Minta versi lebih ringkas, lebih formal, beri contoh, atau sesuaikan dengan konteks yang kamu perlukan.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="cta-panel reveal">
+          <div>
+            <h2>Mulai dari satu pertanyaan.</h2>
+            <p>Temukan ruang yang pas untuk ide dan pekerjaanmu berikutnya.</p>
+          </div>
+          <button class="btn btn-white" data-dashboard>Buka RuangAI <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-main">
+        <div>
+          <a class="brand footer-brand" href="#top"><span class="brand-mark"><iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon></span><span>Ruang<em>AI</em></span></a>
+          <p class="footer-copy">Ruang untuk bertanya, menyusun pikiran, dan membawa ide ke langkah berikutnya.</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <b>JELAJAHI</b>
+            <a href="#fitur">Fitur</a>
+            <a href="#cara-kerja">Cara kerja</a>
+            <a href="#penggunaan">Penggunaan</a>
+          </div>
+          <div class="footer-col">
+            <b>MULAI</b>
+            <a href="#faq">Pertanyaan umum</a>
+            <a href="#top" data-dashboard>Masuk ke RuangAI</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 RuangAI · Dirancang dengan semangat Indonesia</span>
+        <span>Periksa kembali informasi penting dari AI.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div class="workspace hidden" id="workspace">
+  <aside class="workspace-aside">
+    <a class="brand" href="#" data-home><span class="brand-mark"><iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon></span><span>Ruang<em>AI</em></span></a>
+    <nav class="workspace-nav">
+      <button class="active" id="navDash"><iconify-icon icon="lucide:layout-dashboard" aria-hidden="true"></iconify-icon>Dashboard</button>
+      <button id="navNewChat"><iconify-icon icon="lucide:message-circle" aria-hidden="true"></iconify-icon>Percakapan baru</button>
+    </nav>
+    <div class="workspace-label">Riwayat percakapan</div>
+    <div class="workspace-history"></div>
+    <div class="workspace-user">
+      <span class="avatar">MR</span>
+      <div><b>Muhammad Rasyad</b><small>Pengguna RuangAI</small></div>
+    </div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+  <main class="workspace-main">
+    <header class="workspace-top">
+      <button class="mobile-menu" id="workspaceMenu" aria-label="Buka menu"><iconify-icon icon="lucide:menu" aria-hidden="true"></iconify-icon></button>
+      <span class="crumb" id="workspaceCrumb">RuangAI / Dashboard</span>
+      <button class="back-site" data-home>← Kembali ke beranda</button>
+    </header>
+
+    <section class="workspace-content" id="dashboardView">
+      <div class="dash-content">
+        <div class="dash-intro">
+          <div>
+            <h1>Dashboard</h1>
+            <p>Mulai dari ide, lanjutkan percakapan, atau coba prompt baru.</p>
+          </div>
+          <div class="dash-actions">
+            <button class="btn btn-white" id="dashGuided"><iconify-icon icon="lucide:list-checks" aria-hidden="true"></iconify-icon> Tanya bertahap</button>
+            <button class="btn btn-red" id="dashStart"><iconify-icon icon="lucide:plus" aria-hidden="true"></iconify-icon> Chat baru</button>
+          </div>
+        </div>
+        <div class="dash-welcome">
+          <div>
+            <span class="eyebrow">RUANG IDE DAN KARYA</span>
+            <h2>Selamat datang, Rasyad.</h2>
+            <p>Apa yang ingin kamu selesaikan hari ini?</p>
+            <button class="btn btn-red" id="dashContinue">Mulai percakapan <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon></button>
+          </div>
+          <div class="dash-symbol"><iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon></div>
+        </div>
+        <h3 class="dash-section-title">Mulai dengan cepat</h3>
+        <div class="workspace-quick reveal">
+          <button data-chat-prompt="Bantu aku mencari ide proyek yang bermanfaat">
+            <span class="feature-icon"><iconify-icon icon="lucide:lightbulb" aria-hidden="true"></iconify-icon></span>
+            <b>Cari ide</b>
+            <span>Mulai dari hal yang ingin dibuat</span>
+          </button>
+          <button data-chat-prompt="Bantu aku menyusun tulisan yang jelas dan profesional">
+            <span class="feature-icon"><iconify-icon icon="lucide:pen-line" aria-hidden="true"></iconify-icon></span>
+            <b>Bantu menulis</b>
+            <span>Pesan, ringkasan, atau draf</span>
+          </button>
+          <button data-chat-prompt="Jelaskan cara kerja API dengan contoh sederhana">
+            <span class="feature-icon"><iconify-icon icon="lucide:code-xml" aria-hidden="true"></iconify-icon></span>
+            <b>Belajar sesuatu</b>
+            <span>Minta penjelasan dengan contoh</span>
+          </button>
+          <button data-chat-prompt="Buatkan rencana kerja mingguan yang realistis">
+            <span class="feature-icon"><iconify-icon icon="lucide:calendar-days" aria-hidden="true"></iconify-icon></span>
+            <b>Susun rencana</b>
+            <span>Ubah target menjadi langkah kecil</span>
+          </button>
+        </div>
+        <div class="workspace-lower reveal">
+          <section class="workspace-panel">
+            <h3>Percakapan terbaru</h3>
+            <button class="recent-btn" data-history="Ide konten media sosial">
+              <span class="feature-icon"><iconify-icon icon="lucide:message-circle" aria-hidden="true"></iconify-icon></span>
+              <span><b>Ide konten media sosial</b><small>Contoh percakapan · 2 jam lalu</small></span>
+            </button>
+            <button class="recent-btn" data-history="Belajar dasar pemrograman">
+              <span class="feature-icon"><iconify-icon icon="lucide:code-xml" aria-hidden="true"></iconify-icon></span>
+              <span><b>Belajar dasar pemrograman</b><small>Contoh percakapan · Kemarin</small></span>
+            </button>
+            <button class="recent-btn" data-history="Rencana kerja minggu ini">
+              <span class="feature-icon"><iconify-icon icon="lucide:calendar-days" aria-hidden="true"></iconify-icon></span>
+              <span><b>Rencana kerja minggu ini</b><small>Contoh percakapan · 2 hari lalu</small></span>
+            </button>
+          </section>
+          <section class="workspace-panel dashboard-tip">
+            <h3>Tip hari ini</h3>
+            <p>Jelaskan tujuan, konteks, dan bentuk jawaban yang kamu butuhkan. Contoh: <strong>Buat ringkasan singkat untuk pemula, sertakan tiga contoh.</strong></p>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="chat-area" id="chatView">
+      <header class="chat-header">
+        <span class="chat-heading" id="chatTitle">Percakapan baru</span>
+        <span class="chat-status" role="status" aria-live="polite" data-state="loading">Memeriksa koneksi…</span>
+      </header>
+      <div class="chat-scroll" id="chatScroll">
+        <div class="conversation">
+          <div class="chat-welcome" id="chatWelcome">
+            <span class="chat-emblem"><iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon></span>
+            <h2>Ada yang bisa kubantu?</h2>
+            <p>Tulis kebutuhanmu, atau jawab beberapa pertanyaan singkat agar prompt lebih terarah.</p>
+            <button class="guided-link" id="guidedStart"><iconify-icon icon="lucide:list-checks" aria-hidden="true"></iconify-icon> Bantu saya menyusun pertanyaan <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon></button>
+            <div class="prompt-grid">
+              <button class="prompt-card" data-chat-prompt="Bantu aku mencari ide proyek yang bermanfaat">
+                <b><iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>Cari inspirasi</b>
+                <span>Temukan ide untuk proyek berikutnya</span>
+              </button>
+              <button class="prompt-card" data-chat-prompt="Bantu tuliskan pesan profesional untuk rekan kerja">
+                <b><iconify-icon icon="lucide:pen-line" aria-hidden="true"></iconify-icon>Bantu menulis</b>
+                <span>Mulai draf pesan atau dokumen</span>
+              </button>
+              <button class="prompt-card" data-chat-prompt="Jelaskan cara kerja API dengan contoh sederhana">
+                <b><iconify-icon icon="lucide:code-xml" aria-hidden="true"></iconify-icon>Belajar sesuatu</b>
+                <span>Uraikan topik dengan bahasa mudah</span>
+              </button>
+              <button class="prompt-card" data-chat-prompt="Buatkan rencana kerja mingguan yang realistis">
+                <b><iconify-icon icon="lucide:calendar-days" aria-hidden="true"></iconify-icon>Atur rencana</b>
+                <span>Susun langkah dan prioritasmu</span>
+              </button>
+            </div>
+          </div>
+          <div class="messages" id="messages"></div>
+        </div>
+      </div>
+      <div class="composer-wrap">
+        <div class="composer">
+          <textarea id="chatInput" rows="1" maxlength="8000" placeholder="Tulis pesanmu di sini..." aria-label="Tulis pesan"></textarea>
+          <div class="composer-tools">
+            <button id="attach" aria-label="Lampirkan file" title="Lampirkan file"><iconify-icon icon="lucide:paperclip" aria-hidden="true"></iconify-icon></button>
+            <button id="mic" aria-label="Input suara" title="Input suara"><iconify-icon icon="lucide:mic" aria-hidden="true"></iconify-icon></button>
+            <span class="composer-hint">Enter untuk mengirim · Shift + Enter untuk baris baru</span>
+            <button class="send" id="send" aria-label="Kirim pesan"><iconify-icon icon="lucide:arrow-up" aria-hidden="true"></iconify-icon></button>
+          </div>
+        </div>
+        <div class="composer-disclaimer">Jawaban AI dapat keliru. Periksa kembali informasi penting.</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="guided-modal" id="guidedModal" aria-hidden="true">
+  <div class="guided-dialog" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+    <div class="wizard-top">
+      <div>
+        <span class="wizard-eyebrow">PANDUAN BERTANYA</span>
+        <div class="wizard-step-label" id="wizardStepLabel">Langkah 1 dari 4</div>
+      </div>
+      <button class="wizard-close" id="wizardClose" aria-label="Tutup panduan"><iconify-icon icon="lucide:x" aria-hidden="true"></iconify-icon></button>
+    </div>
+    <div class="wizard-progress"><span id="wizardProgress"></span></div>
+    <div class="wizard-content">
+      <h2 id="wizardTitle">Kamu ingin dibantu untuk apa?</h2>
+      <p id="wizardSubtitle">Pilih tujuan yang paling mendekati kebutuhanmu.</p>
+      <div class="wizard-panel active" data-wizard-step="1">
+        <div class="flow-options">
+          <button class="flow-option" data-goal="belajar dan memahami sesuatu" aria-pressed="false">
+            <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
+            <span><b>Belajar</b><small>Memahami topik atau mencari penjelasan</small></span>
+          </button>
+          <button class="flow-option" data-goal="menulis atau merapikan sebuah tulisan" aria-pressed="false">
+            <iconify-icon icon="lucide:pen-line" aria-hidden="true"></iconify-icon>
+            <span><b>Menulis</b><small>Menyusun pesan, dokumen, atau konten</small></span>
+          </button>
+          <button class="flow-option" data-goal="menyusun rencana untuk mencapai tujuan" aria-pressed="false">
+            <iconify-icon icon="lucide:calendar-check-2" aria-hidden="true"></iconify-icon>
+            <span><b>Membuat rencana</b><small>Mengatur prioritas dan langkah kerja</small></span>
+          </button>
+          <button class="flow-option" data-goal="mengembangkan ide baru" aria-pressed="false">
+            <iconify-icon icon="lucide:lightbulb" aria-hidden="true"></iconify-icon>
+            <span><b>Mencari ide</b><small>Membuka pilihan dan sudut pandang baru</small></span>
+          </button>
+        </div>
+      </div>
+      <div class="wizard-panel" data-wizard-step="2">
+        <label class="wizard-label" for="wizardContext">Ceritakan sedikit konteksnya</label>
+        <textarea id="wizardContext" maxlength="400" placeholder="Contoh: Saya ingin belajar Laravel untuk membuat aplikasi kantor, tetapi baru memahami dasar PHP."></textarea>
+        <div class="field-meta"><span>Detail secukupnya sudah membantu.</span><span id="contextCount">0/400</span></div>
+      </div>
+      <div class="wizard-panel" data-wizard-step="3">
+        <div class="flow-options format-options">
+          <button class="flow-option" data-format="singkat dan mudah dipahami" aria-pressed="false">
+            <iconify-icon icon="lucide:align-left" aria-hidden="true"></iconify-icon>
+            <span><b>Ringkas dan jelas</b><small>Inti jawaban tanpa banyak uraian</small></span>
+          </button>
+          <button class="flow-option" data-format="langkah demi langkah" aria-pressed="false">
+            <iconify-icon icon="lucide:list-ordered" aria-hidden="true"></iconify-icon>
+            <span><b>Langkah demi langkah</b><small>Urutan tindakan yang mudah diikuti</small></span>
+          </button>
+          <button class="flow-option" data-format="dengan contoh praktis" aria-pressed="false">
+            <iconify-icon icon="lucide:blocks" aria-hidden="true"></iconify-icon>
+            <span><b>Dengan contoh</b><small>Penjelasan disertai contoh sehari-hari</small></span>
+          </button>
+          <button class="flow-option" data-format="dengan bahasa profesional dan sopan" aria-pressed="false">
+            <iconify-icon icon="lucide:briefcase-business" aria-hidden="true"></iconify-icon>
+            <span><b>Profesional</b><small>Nada rapi untuk kebutuhan kerja</small></span>
+          </button>
+        </div>
+      </div>
+      <div class="wizard-panel" data-wizard-step="4">
+        <div class="review-label"><iconify-icon icon="lucide:check-check" aria-hidden="true"></iconify-icon> Pertanyaanmu siap digunakan</div>
+        <div class="prompt-preview" id="wizardPreview"></div>
+        <p class="review-help">Kamu bisa kembali untuk memperbaiki pilihan atau konteks.</p>
+      </div>
+    </div>
+    <div class="wizard-footer">
+      <button class="wizard-back" id="wizardBack" disabled><iconify-icon icon="lucide:arrow-left" aria-hidden="true"></iconify-icon> Kembali</button>
+      <button class="btn btn-red wizard-next" id="wizardNext" disabled>Lanjutkan <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="ui.js"></script>
+<script src="markdown.js"></script>
+<script src="chat.js"></script>
+</body>
+</html>

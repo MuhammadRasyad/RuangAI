@@ -1,0 +1,8 @@
+node_modules/
+client/dist/
+server/.env
+*.log
+_backup_dailyai/
+.env
+.env.*
+!.env.example

@@ -1,0 +1,11 @@
+const assert = require("node:assert/strict");
+const md = require("markdown-it")({ html: false, breaks: true, linkify: true });
+md.disable("image");
+const html = md.render("Halo!\n\n* **Menyusun ide** atau rencana.\n* **Menulis** dokumen.\n\n~~~js\nconsole.log(1)\n~~~");
+assert(html.includes("<strong>Menyusun ide</strong>"));
+assert(html.includes("<ul>"));
+assert(html.includes('<pre><code class="language-js">'));
+assert(!md.render("<script>alert(1)</script>").includes("<script>"));
+assert(!md.render("[klik](javascript:alert(1))").includes("href="));
+assert(!md.render("![gambar](https://example.com/pixel)").includes("<img"));
+console.log("PASS: Markdown bold, lists, code, unsafe HTML/links and external images");
